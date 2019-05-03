@@ -11,8 +11,9 @@ RUN apk -U upgrade --update && \
     apk add curl && \
     apk add ttf-dejavu && \
     apk add iperf3 && \
-    apk add bash
-
+    apk add bash && \
+    apk add socat
+  
 RUN mkdir -p /opt
 
 # install tomcat
