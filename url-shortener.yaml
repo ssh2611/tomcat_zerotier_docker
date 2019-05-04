@@ -1,0 +1,60 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: url-shortener
+spec:
+  type: NodePort
+  ports:
+    -
+      port: 8080
+      protocol: TCP
+      name: http
+  selector:
+    app: url-shortener
+---
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: url-shortener
+spec:
+  selector:
+    name: url-shortener    
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        name: url-shortener
+ 
+    spec:
+      hostNetwork: true
+      volumes:
+        -
+          name: zerotier
+          hostPath:
+            path: /var/lib/zerotier-one
+        - 
+          name: dev-net-tun
+          hostPath:
+            path: /dev/net/tun
+      containers:
+        -
+          name: url-shortener
+          volumeMounts:
+            -
+              name: zerotier
+              mountPath: /var/lib/zerotier-one
+            - 
+              readOnly: true
+              name: dev-net-tun
+              mountPath: /dev/net/tun
+          image: wscs1958/url-shortener-final
+          ports:
+            -
+              containerPort: 8080
+          securityContext:
+            capabilities:
+              add:
+                - NET_ADMIN
+                - SYS_ADMIN
+
+
